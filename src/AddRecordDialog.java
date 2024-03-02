@@ -25,20 +25,21 @@ import net.miginfocom.swing.MigLayout;
 public class AddRecordDialog extends JDialog implements ActionListener {
 	JTextField idField, ppsField, surnameField, firstNameField, salaryField;
 	JComboBox<String> genderCombo, departmentCombo, fullTimeCombo;
-	JButton save, cancel;
-	EmployeeDetails parent;
+	JButton saveBtn, cancelBtn;
+	EmployeeDetails employeeDetails;
+	Refactor refactor;
 	// constructor for add record dialog
-	public AddRecordDialog(EmployeeDetails parent) {
+	public AddRecordDialog(EmployeeDetails employeeDetails) {
 		setTitle("Add Record");
 		setModal(true);
-		this.parent = parent;
-		this.parent.setEnabled(false);
+		this.employeeDetails = employeeDetails;
+		this.employeeDetails.setEnabled(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		JScrollPane scrollPane = new JScrollPane(dialogPane());
 		setContentPane(scrollPane);
 		
-		getRootPane().setDefaultButton(save);
+		getRootPane().setDefaultButton(saveBtn);
 		
 		setSize(500, 370);
 		setLocation(350, 250);
@@ -47,78 +48,84 @@ public class AddRecordDialog extends JDialog implements ActionListener {
 
 	// initialize dialog container
 	public Container dialogPane() {
-		JPanel empDetails, buttonPanel;
-		empDetails = new JPanel(new MigLayout());
+		JPanel empDetailsPanel, buttonPanel;
+		empDetailsPanel = new JPanel(new MigLayout());
 		buttonPanel = new JPanel();
 		JTextField field;
 
-		empDetails.setBorder(BorderFactory.createTitledBorder("Employee Details"));
+		empDetailsPanel.setBorder(BorderFactory.createTitledBorder("Employee Details"));
 
-		empDetails.add(new JLabel("ID:"), "growx, pushx");
-		empDetails.add(idField = new JTextField(20), "growx, pushx, wrap");
+		empDetailsPanel.add(new JLabel("ID:"), "growx, pushx");
+		empDetailsPanel.add(idField = new JTextField(20), "growx, pushx, wrap");
 		idField.setEditable(false);
 		
 
-		empDetails.add(new JLabel("PPS Number:"), "growx, pushx");
-		empDetails.add(ppsField = new JTextField(20), "growx, pushx, wrap");
+		empDetailsPanel.add(new JLabel("PPS Number:"), "growx, pushx");
+		empDetailsPanel.add(ppsField = new JTextField(20), "growx, pushx, wrap");
 
-		empDetails.add(new JLabel("Surname:"), "growx, pushx");
-		empDetails.add(surnameField = new JTextField(20), "growx, pushx, wrap");
+		empDetailsPanel.add(new JLabel("Surname:"), "growx, pushx");
+		empDetailsPanel.add(surnameField = new JTextField(20), "growx, pushx, wrap");
 
-		empDetails.add(new JLabel("First Name:"), "growx, pushx");
-		empDetails.add(firstNameField = new JTextField(20), "growx, pushx, wrap");
+		empDetailsPanel.add(new JLabel("First Name:"), "growx, pushx");
+		empDetailsPanel.add(firstNameField = new JTextField(20), "growx, pushx, wrap");
 
-		empDetails.add(new JLabel("Gender:"), "growx, pushx");
-		empDetails.add(genderCombo = new JComboBox<String>(this.parent.gender), "growx, pushx, wrap");
+		empDetailsPanel.add(new JLabel("Gender:"), "growx, pushx");
+		empDetailsPanel.add(genderCombo = new JComboBox<String>(this.employeeDetails.gender), "growx, pushx, wrap");
 
-		empDetails.add(new JLabel("Department:"), "growx, pushx");
-		empDetails.add(departmentCombo = new JComboBox<String>(this.parent.department), "growx, pushx, wrap");
+		empDetailsPanel.add(new JLabel("Department:"), "growx, pushx");
+		empDetailsPanel.add(departmentCombo = new JComboBox<String>(this.employeeDetails.department), "growx, pushx, wrap");
 
-		empDetails.add(new JLabel("Salary:"), "growx, pushx");
-		empDetails.add(salaryField = new JTextField(20), "growx, pushx, wrap");
+		empDetailsPanel.add(new JLabel("Salary:"), "growx, pushx");
+		empDetailsPanel.add(salaryField = new JTextField(20), "growx, pushx, wrap");
 
-		empDetails.add(new JLabel("Full Time:"), "growx, pushx");
-		empDetails.add(fullTimeCombo = new JComboBox<String>(this.parent.fullTime), "growx, pushx, wrap");
+		empDetailsPanel.add(new JLabel("Full Time:"), "growx, pushx");
+		empDetailsPanel.add(fullTimeCombo = new JComboBox<String>(this.employeeDetails.fullTime), "growx, pushx, wrap");
 
-		buttonPanel.add(save = new JButton("Save"));
-		save.addActionListener(this);
-		save.requestFocus();
-		buttonPanel.add(cancel = new JButton("Cancel"));
-		cancel.addActionListener(this);
+		buttonPanel.add(saveBtn = new JButton("Save"));
+		saveBtn.addActionListener(this);
+		saveBtn.requestFocus();
+		buttonPanel.add(cancelBtn = new JButton("Cancel"));
+		cancelBtn.addActionListener(this);
 
-		empDetails.add(buttonPanel, "span 2,growx, pushx,wrap");
+		empDetailsPanel.add(buttonPanel, "span 2,growx, pushx,wrap");
 		// loop through all panel components and add fonts and listeners
-		for (int i = 0; i < empDetails.getComponentCount(); i++) {
-			empDetails.getComponent(i).setFont(this.parent.font1);
-			if (empDetails.getComponent(i) instanceof JComboBox) {
-				empDetails.getComponent(i).setBackground(Color.WHITE);
+		for (int i = 0; i < empDetailsPanel.getComponentCount(); i++) {
+			empDetailsPanel.getComponent(i).setFont(this.employeeDetails.font);
+			if (empDetailsPanel.getComponent(i) instanceof JComboBox) {
+				empDetailsPanel.getComponent(i).setBackground(Color.WHITE);
 			}// end if
-			else if(empDetails.getComponent(i) instanceof JTextField){
-				field = (JTextField) empDetails.getComponent(i);
+			else if(empDetailsPanel.getComponent(i) instanceof JTextField){
+				field = (JTextField) empDetailsPanel.getComponent(i);
 				if(field == ppsField)
 					field.setDocument(new JTextFieldLimit(9));
 				else
 				field.setDocument(new JTextFieldLimit(20));
 			}// end else if
 		}// end for
-		idField.setText(Integer.toString(this.parent.getNextFreeId()));
-		return empDetails;
+		idField.setText(Integer.toString(this.employeeDetails.getNextFreeId()));
+		return empDetailsPanel;
 	}
 
 	// add record to file
 	public void addRecord() {
 		boolean fullTime = false;
-		Employee theEmployee;
+		Employee employee;
 
 		if (((String) fullTimeCombo.getSelectedItem()).equalsIgnoreCase("Yes"))
 			fullTime = true;
 		// create new Employee record with details from text fields
-		theEmployee = new Employee(Integer.parseInt(idField.getText()), ppsField.getText().toUpperCase(), surnameField.getText().toUpperCase(),
-				firstNameField.getText().toUpperCase(), genderCombo.getSelectedItem().toString().charAt(0),
-				departmentCombo.getSelectedItem().toString(), Double.parseDouble(salaryField.getText()), fullTime);
-		this.parent.currentEmployee = theEmployee;
-		this.parent.addRecord(theEmployee);
-		this.parent.displayRecords(theEmployee);
+		employee = new Employee(
+				Integer.parseInt(idField.getText()), 
+				ppsField.getText().toUpperCase(), 
+				surnameField.getText().toUpperCase(),
+				firstNameField.getText().toUpperCase(),
+				genderCombo.getSelectedItem().toString().charAt(0),
+				departmentCombo.getSelectedItem().toString(), 
+				Double.parseDouble(salaryField.getText()), 
+				fullTime);
+		this.employeeDetails.currentEmployee = employee;
+		this.employeeDetails.addRecord(employee);
+		this.employeeDetails.displayRecords(employee);
 	}
 
 	// check for input in text fields
@@ -129,7 +136,7 @@ public class AddRecordDialog extends JDialog implements ActionListener {
 			ppsField.setBackground(new Color(255, 150, 150));
 			valid = false;
 		}// end if
-		if (this.parent.correctPps(this.ppsField.getText().trim(), -1)) {
+		if (this.employeeDetails.correctPps(this.ppsField.getText().trim(), -1)) {
 			ppsField.setBackground(new Color(255, 150, 150));
 			valid = false;
 		}// end if
@@ -182,12 +189,12 @@ public class AddRecordDialog extends JDialog implements ActionListener {
 	// action performed
 	public void actionPerformed(ActionEvent e) {
 		// if chosen option save, save record to file
-		if (e.getSource() == save) {
+		if (e.getSource() == saveBtn) {
 			// if inputs correct, save record
 			if (checkInput()) {
 				addRecord();// add record to file
 				dispose();// dispose dialog
-				this.parent.changesMade = true;
+				this.employeeDetails.changesMade = true;
 			}// end if
 			// else display message and set text fields to white colour
 			else {
@@ -195,7 +202,7 @@ public class AddRecordDialog extends JDialog implements ActionListener {
 				setToWhite();
 			}// end else
 		}// end if
-		else if (e.getSource() == cancel)
+		else if (e.getSource() == cancelBtn)
 			dispose();// dispose dialog
 	}// end actionPerformed
 }// end class AddRecordDialog

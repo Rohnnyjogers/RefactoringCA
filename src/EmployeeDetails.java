@@ -69,11 +69,13 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 			searchBySurname, listAll, closeApp;
 	private JButton first, previous, next, last, add, edit, deleteButton, displayAll, searchId, searchSurname,
 			saveChange, cancelChange;
-	private JComboBox<String> genderCombo, departmentCombo, fullTimeCombo;
-	private JTextField idField, ppsField, surnameField, firstNameField, salaryField;
+	protected JComboBox<String> genderComboBox, deptComboBox, fullTimeComboBox;
+	protected JTextField idField, surnameField, firstNameField, salaryField;
+	protected JTextField ppsField;
 	private static EmployeeDetails frame = new EmployeeDetails();
-	// font for labels, text fields and combo boxes
-	Font font1 = new Font("SansSerif", Font.BOLD, 16);
+	/*Font for labels, text fields and combo boxes within
+	 *an employee details panel.*/
+	Font font = new Font("SansSerif", Font.BOLD, 16);
 	// holds automatically generated file name
 	String generatedFileName;
 	// holds current Employee object
@@ -86,6 +88,8 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 	// full time combo box values
 	String[] fullTime = { "", "Yes", "No" };
 
+	Refactor refactor = new Refactor();
+	
 	// initialize menu bar
 	private JMenuBar menuBar() {
 		JMenuBar menuBar = new JMenuBar();
@@ -222,36 +226,9 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 
 	// initialize main/details panel
 	private JPanel detailsPanel() {
-		JPanel empDetails = new JPanel(new MigLayout());
+		
 		JPanel buttonPanel = new JPanel();
-		JTextField field;
-
-		empDetails.setBorder(BorderFactory.createTitledBorder("Employee Details"));
-
-		empDetails.add(new JLabel("ID:"), "growx, pushx");
-		empDetails.add(idField = new JTextField(20), "growx, pushx, wrap");
-		idField.setEditable(false);
-
-		empDetails.add(new JLabel("PPS Number:"), "growx, pushx");
-		empDetails.add(ppsField = new JTextField(20), "growx, pushx, wrap");
-
-		empDetails.add(new JLabel("Surname:"), "growx, pushx");
-		empDetails.add(surnameField = new JTextField(20), "growx, pushx, wrap");
-
-		empDetails.add(new JLabel("First Name:"), "growx, pushx");
-		empDetails.add(firstNameField = new JTextField(20), "growx, pushx, wrap");
-
-		empDetails.add(new JLabel("Gender:"), "growx, pushx");
-		empDetails.add(genderCombo = new JComboBox<String>(gender), "growx, pushx, wrap");
-
-		empDetails.add(new JLabel("Department:"), "growx, pushx");
-		empDetails.add(departmentCombo = new JComboBox<String>(department), "growx, pushx, wrap");
-
-		empDetails.add(new JLabel("Salary:"), "growx, pushx");
-		empDetails.add(salaryField = new JTextField(20), "growx, pushx, wrap");
-
-		empDetails.add(new JLabel("Full Time:"), "growx, pushx");
-		empDetails.add(fullTimeCombo = new JComboBox<String>(fullTime), "growx, pushx, wrap");
+		JPanel employeeDetailsPanel = refactor.createEmployeeDetailsPanel(this);
 
 		buttonPanel.add(saveChange = new JButton("Save"));
 		saveChange.addActionListener(this);
@@ -262,34 +239,35 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 		cancelChange.setVisible(false);
 		cancelChange.setToolTipText("Cancel edit");
 
-		empDetails.add(buttonPanel, "span 2,growx, pushx,wrap");
-
+		employeeDetailsPanel.add(buttonPanel, "span 2,growx, pushx,wrap");
+		
+		refactor.addStyleAndListeners(employeeDetailsPanel, this);
 		// loop through panel components and add listeners and format
-		for (int i = 0; i < empDetails.getComponentCount(); i++) {
-			empDetails.getComponent(i).setFont(font1);
-			if (empDetails.getComponent(i) instanceof JTextField) {
-				field = (JTextField) empDetails.getComponent(i);
-				field.setEditable(false);
-				if (field == ppsField)
-					field.setDocument(new JTextFieldLimit(9));
-				else
-					field.setDocument(new JTextFieldLimit(20));
-				field.getDocument().addDocumentListener(this);
-			} // end if
-			else if (empDetails.getComponent(i) instanceof JComboBox) {
-				empDetails.getComponent(i).setBackground(Color.WHITE);
-				empDetails.getComponent(i).setEnabled(false);
-				((JComboBox<String>) empDetails.getComponent(i)).addItemListener(this);
-				((JComboBox<String>) empDetails.getComponent(i)).setRenderer(new DefaultListCellRenderer() {
-					// set foregroung to combo boxes
-					public void paint(Graphics g) {
-						setForeground(new Color(65, 65, 65));
-						super.paint(g);
-					}// end paint
-				});
-			} // end else if
-		} // end for
-		return empDetails;
+//		for (int i = 0; i < empDetails.getComponentCount(); i++) {
+//			empDetails.getComponent(i).setFont(font);
+//			if (empDetails.getComponent(i) instanceof JTextField) {
+//				field = (JTextField) empDetails.getComponent(i);
+//				field.setEditable(false);
+//				if (field == ppsField)
+//					field.setDocument(new JTextFieldLimit(9));
+//				else
+//					field.setDocument(new JTextFieldLimit(20));
+//				field.getDocument().addDocumentListener(this);
+//			} // end if
+//			else if (empDetails.getComponent(i) instanceof JComboBox) {
+//				empDetails.getComponent(i).setBackground(Color.WHITE);
+//				empDetails.getComponent(i).setEnabled(false);
+//				((JComboBox<String>) empDetails.getComponent(i)).addItemListener(this);
+//				((JComboBox<String>) empDetails.getComponent(i)).setRenderer(new DefaultListCellRenderer() {
+//					// set foreground to combo boxes
+//					public void paint(Graphics g) {
+//						setForeground(new Color(65, 65, 65));
+//						super.paint(g);
+//					}// end paint
+//				});
+//			} // end else if
+//		} // end for
+		return employeeDetailsPanel;
 	}// end detailsPanel
 
 	// display current Employee details
@@ -324,14 +302,14 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 			ppsField.setText(thisEmployee.getPps().trim());
 			surnameField.setText(thisEmployee.getSurname().trim());
 			firstNameField.setText(thisEmployee.getFirstName());
-			genderCombo.setSelectedIndex(countGender);
-			departmentCombo.setSelectedIndex(countDep);
+			genderComboBox.setSelectedIndex(countGender);
+			deptComboBox.setSelectedIndex(countDep);
 			salaryField.setText(format.format(thisEmployee.getSalary()));
 			// set corresponding full time combo box value to current employee
 			if (thisEmployee.getFullTime() == true)
-				fullTimeCombo.setSelectedIndex(1);
+				fullTimeComboBox.setSelectedIndex(1);
 			else
-				fullTimeCombo.setSelectedIndex(2);
+				fullTimeComboBox.setSelectedIndex(2);
 		}
 		change = false;
 	}// end display records
@@ -533,12 +511,12 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 	private Employee getChangedDetails() {
 		boolean fullTime = false;
 		Employee theEmployee;
-		if (((String) fullTimeCombo.getSelectedItem()).equalsIgnoreCase("Yes"))
+		if (((String) fullTimeComboBox.getSelectedItem()).equalsIgnoreCase("Yes"))
 			fullTime = true;
 
 		theEmployee = new Employee(Integer.parseInt(idField.getText()), ppsField.getText().toUpperCase(),
 				surnameField.getText().toUpperCase(), firstNameField.getText().toUpperCase(),
-				genderCombo.getSelectedItem().toString().charAt(0), departmentCombo.getSelectedItem().toString(),
+				genderComboBox.getSelectedItem().toString().charAt(0), deptComboBox.getSelectedItem().toString(),
 				Double.parseDouble(salaryField.getText()), fullTime);
 
 		return theEmployee;
@@ -638,9 +616,9 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 			surnameField.setText("");
 			firstNameField.setText("");
 			salaryField.setText("");
-			genderCombo.setSelectedIndex(0);
-			departmentCombo.setSelectedIndex(0);
-			fullTimeCombo.setSelectedIndex(0);
+			genderComboBox.setSelectedIndex(0);
+			deptComboBox.setSelectedIndex(0);
+			fullTimeComboBox.setSelectedIndex(0);
 			JOptionPane.showMessageDialog(null, "No Employees registered!");
 		}
 		return someoneToDisplay;
@@ -722,12 +700,12 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 			firstNameField.setBackground(new Color(255, 150, 150));
 			valid = false;
 		} // end if
-		if (genderCombo.getSelectedIndex() == 0 && genderCombo.isEnabled()) {
-			genderCombo.setBackground(new Color(255, 150, 150));
+		if (genderComboBox.getSelectedIndex() == 0 && genderComboBox.isEnabled()) {
+			genderComboBox.setBackground(new Color(255, 150, 150));
 			valid = false;
 		} // end if
-		if (departmentCombo.getSelectedIndex() == 0 && departmentCombo.isEnabled()) {
-			departmentCombo.setBackground(new Color(255, 150, 150));
+		if (deptComboBox.getSelectedIndex() == 0 && deptComboBox.isEnabled()) {
+			deptComboBox.setBackground(new Color(255, 150, 150));
 			valid = false;
 		} // end if
 		try {// try to get values from text field
@@ -744,8 +722,8 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 				valid = false;
 			} // end if
 		} // end catch
-		if (fullTimeCombo.getSelectedIndex() == 0 && fullTimeCombo.isEnabled()) {
-			fullTimeCombo.setBackground(new Color(255, 150, 150));
+		if (fullTimeComboBox.getSelectedIndex() == 0 && fullTimeComboBox.isEnabled()) {
+			fullTimeComboBox.setBackground(new Color(255, 150, 150));
 			valid = false;
 		} // end if
 			// display message if any input or format is wrong
@@ -764,9 +742,9 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 		surnameField.setBackground(UIManager.getColor("TextField.background"));
 		firstNameField.setBackground(UIManager.getColor("TextField.background"));
 		salaryField.setBackground(UIManager.getColor("TextField.background"));
-		genderCombo.setBackground(UIManager.getColor("TextField.background"));
-		departmentCombo.setBackground(UIManager.getColor("TextField.background"));
-		fullTimeCombo.setBackground(UIManager.getColor("TextField.background"));
+		genderComboBox.setBackground(UIManager.getColor("TextField.background"));
+		deptComboBox.setBackground(UIManager.getColor("TextField.background"));
+		fullTimeComboBox.setBackground(UIManager.getColor("TextField.background"));
 	}// end setToWhite
 
 	// enable text fields for editing
@@ -779,10 +757,10 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 		ppsField.setEditable(booleanValue);
 		surnameField.setEditable(booleanValue);
 		firstNameField.setEditable(booleanValue);
-		genderCombo.setEnabled(booleanValue);
-		departmentCombo.setEnabled(booleanValue);
+		genderComboBox.setEnabled(booleanValue);
+		deptComboBox.setEnabled(booleanValue);
 		salaryField.setEditable(booleanValue);
-		fullTimeCombo.setEnabled(booleanValue);
+		fullTimeComboBox.setEnabled(booleanValue);
 		saveChange.setVisible(booleanValue);
 		cancelChange.setVisible(booleanValue);
 		searchByIdField.setEnabled(search);

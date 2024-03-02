@@ -194,7 +194,7 @@ public class AddRecordDialog extends JDialog implements ActionListener {
 			if (checkInput()) {
 				addRecord();// add record to file
 				dispose();// dispose dialog
-				this.employeeDetails.changesMade = true;
+				this.employeeDetails.fileChange = true;
 			}// end if
 			// else display message and set text fields to white colour
 			else {

@@ -2,7 +2,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JPanel;
 
-public interface EmployeeDatailsInterface {
+public interface EmployeeDetailsInterface {
 	public boolean checkInput();
 	public void setToWhite();
 	public JPanel createEmployeeDetailsPanel();

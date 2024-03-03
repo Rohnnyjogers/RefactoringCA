@@ -29,7 +29,7 @@ import net.miginfocom.swing.MigLayout;
 public class EmployeeSummaryDialog extends JDialog implements ActionListener {
 	// vector with all Employees details
 	Vector<Object> allEmployees;
-	JButton back;
+	JButton backBtn;
 	
 	public EmployeeSummaryDialog(Vector<Object> allEmployees) {
 		setTitle("Employee Summary");
@@ -101,9 +101,9 @@ public class EmployeeSummaryDialog extends JDialog implements ActionListener {
 		employeeTable.setAutoCreateRowSorter(true);
 		JScrollPane scrollPane = new JScrollPane(employeeTable);
 
-		buttonPanel.add(back = new JButton("Back"));
-		back.addActionListener(this);
-		back.setToolTipText("Return to main screen");
+		buttonPanel.add(backBtn = new JButton("Back"));
+		backBtn.addActionListener(this);
+		backBtn.setToolTipText("Return to main screen");
 		
 		summaryDialog.add(buttonPanel,"growx, pushx, wrap");
 		summaryDialog.add(scrollPane,"growx, pushx, wrap");
@@ -113,7 +113,7 @@ public class EmployeeSummaryDialog extends JDialog implements ActionListener {
 	}// end summaryPane
 
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == back){
+		if (e.getSource() == backBtn){
 			dispose();
 		}
 

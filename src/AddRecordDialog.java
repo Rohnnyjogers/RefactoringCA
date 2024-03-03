@@ -22,7 +22,7 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 
-public class AddRecordDialog extends JDialog implements ActionListener, RefactorInterface {
+public class AddRecordDialog extends JDialog implements ActionListener, EmployeeDatailsInterface {
 	protected JTextField idField, ppsField, surnameField, firstNameField, salaryField;
 	protected JComboBox<String> genderComboBox, deptComboBox, fullTimeComboBox;
 	JButton saveBtn, cancelBtn;

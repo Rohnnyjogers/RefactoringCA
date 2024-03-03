@@ -49,7 +49,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 
-public class EmployeeDetails extends JFrame implements ActionListener, ItemListener, DocumentListener, WindowListener, RefactorInterface {
+public class EmployeeDetails extends JFrame implements ActionListener, ItemListener, DocumentListener, WindowListener, EmployeeDatailsInterface {
 	// decimal format for inactive currency text field
 	private static final DecimalFormat format = new DecimalFormat("\u20ac ###,###,##0.00");
 	// decimal format for active currency text field
@@ -342,48 +342,49 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 	}
 
 	// display current Employee details
-	public void displayRecords(Employee thisEmployee) {
+	public void displayRecords(Employee employee) {
 		int countGender = 0;
-		int countDep = 0;
+		int countDept = 0;
 		boolean found = false;
 
 		searchByIdField.setText("");
 		searchBySurnameField.setText("");
 		// if Employee is null or ID is 0 do nothing else display Employee
 		// details
-		if (thisEmployee == null) {
-		} else if (thisEmployee.getEmployeeId() == 0) {
-		} else {
-			// find corresponding gender combo box value to current employee
-			while (!found && countGender < gender.length - 1) {
-				if (Character.toString(thisEmployee.getGender()).equalsIgnoreCase(gender[countGender]))
-					found = true;
-				else
-					countGender++;
-			} // end while
-			found = false;
-			// find corresponding department combo box value to current employee
-			while (!found && countDep < department.length - 1) {
-				if (thisEmployee.getDepartment().trim().equalsIgnoreCase(department[countDep]))
-					found = true;
-				else
-					countDep++;
-			} // end while
-			idField.setText(Integer.toString(thisEmployee.getEmployeeId()));
-			ppsField.setText(thisEmployee.getPps().trim());
-			surnameField.setText(thisEmployee.getSurname().trim());
-			firstNameField.setText(thisEmployee.getFirstName());
-			genderComboBox.setSelectedIndex(countGender);
-			deptComboBox.setSelectedIndex(countDep);
-			salaryField.setText(format.format(thisEmployee.getSalary()));
-			// set corresponding full time combo box value to current employee
-			if (thisEmployee.getFullTime() == true)
-				fullTimeComboBox.setSelectedIndex(1);
-			else
-				fullTimeComboBox.setSelectedIndex(2);
+		if (employee != null && employee.getEmployeeId() != 0) {
+			displayEmployeeDetails(employee, countGender, countDept, found);
 		}
 		textFieldChange = false;
 	}// end display records
+	
+	public void displayEmployeeDetails(Employee employee, int countGender, int countDept, boolean found) {
+		while (!found && countGender < gender.length - 1) {
+			if (Character.toString(employee.getGender()).equalsIgnoreCase(gender[countGender]))
+				found = true;
+			else
+				countGender++;
+		} // end while
+		found = false;
+		// find corresponding department combo box value to current employee
+		while (!found && countDept < department.length - 1) {
+			if (employee.getDepartment().trim().equalsIgnoreCase(department[countDept]))
+				found = true;
+			else
+				countDept++;
+		} // end while
+		idField.setText(Integer.toString(employee.getEmployeeId()));
+		ppsField.setText(employee.getPps().trim());
+		surnameField.setText(employee.getSurname().trim());
+		firstNameField.setText(employee.getFirstName());
+		genderComboBox.setSelectedIndex(countGender);
+		deptComboBox.setSelectedIndex(countDept);
+		salaryField.setText(format.format(employee.getSalary()));
+		// set corresponding full time combo box value to current employee
+		if (employee.getFullTime() == true)
+			fullTimeComboBox.setSelectedIndex(1);
+		else
+			fullTimeComboBox.setSelectedIndex(2);
+	}
 
 	// display Employee summary dialog
 	private void displayEmployeeSummaryDialog() {
@@ -482,39 +483,13 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 
 	// search Employee by ID
 	public void searchEmployeeById() {
-		boolean found = false;
 
 		try {// try to read correct correct from input
 				// if any active Employee record search for ID else do nothing
 			if (recordValid()) {
 				firstRecord();// look for first record
 				int firstId = currentEmployee.getEmployeeId();
-				// if ID to search is already displayed do nothing else loop
-				// through records
-				if (searchByIdField.getText().trim().equals(idField.getText().trim()))
-					found = true;
-				else if (searchByIdField.getText().trim().equals(Integer.toString(currentEmployee.getEmployeeId()))) {
-					found = true;
-					displayRecords(currentEmployee);
-				} // end else if
-				else {
-					nextRecord();// look for next record
-					// loop until Employee found or until all Employees have
-					// been checked
-					while (firstId != currentEmployee.getEmployeeId()) {
-						// if found break from loop and display Employee details
-						// else look for next record
-						if (Integer.parseInt(searchByIdField.getText().trim()) == currentEmployee.getEmployeeId()) {
-							found = true;
-							displayRecords(currentEmployee);
-							break;
-						} else
-							nextRecord();// look for next record
-					} // end while
-				} // end else
-					// if Employee not found display message
-				if (!found)
-					JOptionPane.showMessageDialog(null, "Employee not found!");
+				searchRecords(firstId);
 			} // end if
 		} // end try
 		catch (NumberFormatException e) {
@@ -524,41 +499,74 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 		searchByIdField.setBackground(Color.WHITE);
 		searchByIdField.setText("");
 	}// end searchEmployeeByID
-
+	
+	public void searchRecords(int employeeId) {
+		boolean found = false;
+		if (searchByIdField.getText().trim().equals(idField.getText().trim()))
+			found = true;
+		else if (searchByIdField.getText().trim().equals(Integer.toString(currentEmployee.getEmployeeId()))) {
+			found = true;
+			displayRecords(currentEmployee);
+		} // end else if
+		else {
+			nextRecord();// look for next record
+			// loop until Employee found or until all Employees have
+			// been checked
+			while (employeeId != currentEmployee.getEmployeeId()) {
+				// if found break from loop and display Employee details
+				// else look for next record
+				if (Integer.parseInt(searchByIdField.getText().trim()) == currentEmployee.getEmployeeId()) {
+					found = true;
+					displayRecords(currentEmployee);
+					break;
+				} else
+					nextRecord();// look for next record
+			} // end while
+		} // end else
+			// if Employee not found display message
+		if (!found)
+			JOptionPane.showMessageDialog(null, "Employee not found!");
+	}
+	
+	public void searchRecords(String surname) {
+		boolean found = false;
+		String firstSurname = currentEmployee.getSurname().trim();
+		// if ID to search is already displayed do nothing else loop through
+		// records
+		if (searchBySurnameField.getText().trim().equalsIgnoreCase(surnameField.getText().trim()))
+			found = true;
+		else if (searchBySurnameField.getText().trim().equalsIgnoreCase(currentEmployee.getSurname().trim())) {
+			found = true;
+			displayRecords(currentEmployee);
+		} // end else if
+		else {
+			nextRecord();// look for next record
+			// loop until Employee found or until all Employees have been
+			// checked
+			while (!firstSurname.trim().equalsIgnoreCase(currentEmployee.getSurname().trim())) {
+				// if found break from loop and display Employee details
+				// else look for next record
+				if (searchBySurnameField.getText().trim().equalsIgnoreCase(currentEmployee.getSurname().trim())) {
+					found = true;
+					displayRecords(currentEmployee);
+					break;
+				} // end if
+				else
+					nextRecord();// look for next record
+			} // end while
+		} // end else
+			// if Employee not found display message
+		if (!found)
+			JOptionPane.showMessageDialog(null, "Employee not found!");
+	}
+	
 	// search Employee by surname
 	public void searchEmployeeBySurname() {
-		boolean found = false;
 		// if any active Employee record search for ID else do nothing
 		if (recordValid()) {
 			firstRecord();// look for first record
 			String firstSurname = currentEmployee.getSurname().trim();
-			// if ID to search is already displayed do nothing else loop through
-			// records
-			if (searchBySurnameField.getText().trim().equalsIgnoreCase(surnameField.getText().trim()))
-				found = true;
-			else if (searchBySurnameField.getText().trim().equalsIgnoreCase(currentEmployee.getSurname().trim())) {
-				found = true;
-				displayRecords(currentEmployee);
-			} // end else if
-			else {
-				nextRecord();// look for next record
-				// loop until Employee found or until all Employees have been
-				// checked
-				while (!firstSurname.trim().equalsIgnoreCase(currentEmployee.getSurname().trim())) {
-					// if found break from loop and display Employee details
-					// else look for next record
-					if (searchBySurnameField.getText().trim().equalsIgnoreCase(currentEmployee.getSurname().trim())) {
-						found = true;
-						displayRecords(currentEmployee);
-						break;
-					} // end if
-					else
-						nextRecord();// look for next record
-				} // end while
-			} // end else
-				// if Employee not found display message
-			if (!found)
-				JOptionPane.showMessageDialog(null, "Employee not found!");
+			searchRecords(firstSurname);
 		} // end if
 		searchBySurnameField.setText("");
 	}// end searchEmployeeBySurname

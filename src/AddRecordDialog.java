@@ -27,7 +27,7 @@ public class AddRecordDialog extends JDialog implements ActionListener, Refactor
 	protected JComboBox<String> genderComboBox, deptComboBox, fullTimeComboBox;
 	JButton saveBtn, cancelBtn;
 	EmployeeDetails employeeDetails;
-	Refactor refactor;
+	Refactor refactor = new Refactor();
 	// constructor for add record dialog
 	public AddRecordDialog(EmployeeDetails employeeDetails) {
 		setTitle("Add Record");
@@ -48,11 +48,73 @@ public class AddRecordDialog extends JDialog implements ActionListener, Refactor
 
 	// initialize dialog container
 	public Container dialogPane() {
-		JPanel employeeDetailsPanel = refactor.createEmployeeDetailsPanel(this);
-		
-		
+		JPanel employeeDetailsPanel = createEmployeeDetailsPanel();
+		formatFields(employeeDetailsPanel);
 		idField.setText(Integer.toString(this.employeeDetails.getNextFreeId()));
 		return employeeDetailsPanel;
+	}
+	
+	@Override
+	public JPanel createEmployeeDetailsPanel() {
+		JPanel employeeDetailsPanel = new JPanel(new MigLayout());
+		JPanel buttonPanel = new JPanel();
+
+		employeeDetailsPanel.setBorder(BorderFactory.createTitledBorder("Employee Details"));
+
+		employeeDetailsPanel.add(new JLabel("ID:"), "growx, pushx");
+		employeeDetailsPanel.add(idField = new JTextField(20), "growx, pushx, wrap");
+		idField.setEditable(false);
+		
+
+		employeeDetailsPanel.add(new JLabel("PPS Number:"), "growx, pushx");
+		employeeDetailsPanel.add(ppsField = new JTextField(20), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Surname:"), "growx, pushx");
+		employeeDetailsPanel.add(surnameField = new JTextField(20), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("First Name:"), "growx, pushx");
+		employeeDetailsPanel.add(firstNameField = new JTextField(20), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Gender:"), "growx, pushx");
+		employeeDetailsPanel.add(genderComboBox = new JComboBox<String>(employeeDetails.gender), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Department:"), "growx, pushx");
+		employeeDetailsPanel.add(deptComboBox = new JComboBox<String>(employeeDetails.department), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Salary:"), "growx, pushx");
+		employeeDetailsPanel.add(salaryField = new JTextField(20), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Full Time:"), "growx, pushx");
+		employeeDetailsPanel.add(fullTimeComboBox = new JComboBox<String>(employeeDetails.fullTime), "growx, pushx, wrap");
+		
+		buttonPanel.add(saveBtn = new JButton("Save"));
+		saveBtn.addActionListener(this);
+		saveBtn.requestFocus();
+		buttonPanel.add(cancelBtn = new JButton("Cancel"));
+		cancelBtn.addActionListener(this);
+		
+		employeeDetailsPanel.add(buttonPanel, "span 2,growx, pushx,wrap");
+	
+		return employeeDetailsPanel;
+	}
+	
+	@Override
+	public void formatFields(JPanel employeeDetailsPanel){
+		JTextField field;
+		
+		for (int i = 0; i < employeeDetailsPanel.getComponentCount(); i++) {
+			employeeDetailsPanel.getComponent(i).setFont(this.employeeDetails.font);
+			if (employeeDetailsPanel.getComponent(i) instanceof JComboBox) {
+				employeeDetailsPanel.getComponent(i).setBackground(Color.WHITE);
+			}// end if
+			else if(employeeDetailsPanel.getComponent(i) instanceof JTextField){
+				field = (JTextField) employeeDetailsPanel.getComponent(i);
+				if(field == ppsField)
+					field.setDocument(new JTextFieldLimit(9));
+				else
+				field.setDocument(new JTextFieldLimit(20));
+			}// end else if
+		}// end for
 	}
 
 	// add record to file
@@ -136,14 +198,9 @@ public class AddRecordDialog extends JDialog implements ActionListener, Refactor
 		deptComboBox.setBackground(Color.WHITE);
 		fullTimeComboBox.setBackground(Color.WHITE);
 	}// end setToWhite
-	
-	@Override
-	public void applyListenersAndFont(){
-		
-	}
-	
 
 	// action performed
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		// if chosen option save, save record to file
 		if (e.getSource() == saveBtn) {

@@ -82,7 +82,7 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 						listAllMenuItm, 
 						closeAppMenuItm;
 	
-	private JButton firstBtn, 
+	protected JButton firstBtn, 
 					previousBtn, 
 					nextBtn, 
 					lastBtn, 
@@ -92,8 +92,8 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 					displayAllBtn, 
 					searchIdBtn, 
 					searchSurnameBtn,
-					saveChangeBtn, 
-					cancelChangeBtn;
+					saveBtn, 
+					cancelBtn;
 	
 	protected JComboBox<String>	genderComboBox, deptComboBox, fullTimeComboBox;
 	
@@ -259,19 +259,19 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 	// initialize main/details panel
 	private JPanel detailsPanel() {
 		
-		JPanel buttonPanel = new JPanel();
+//		JPanel buttonPanel = new JPanel();
 		JPanel employeeDetailsPanel = refactor.createEmployeeDetailsPanel(this);
 
-		buttonPanel.add(saveChangeBtn = new JButton("Save"));
-		saveChangeBtn.addActionListener(this);
-		saveChangeBtn.setVisible(false);
-		saveChangeBtn.setToolTipText("Save changes");
-		buttonPanel.add(cancelChangeBtn = new JButton("Cancel"));
-		cancelChangeBtn.addActionListener(this);
-		cancelChangeBtn.setVisible(false);
-		cancelChangeBtn.setToolTipText("Cancel edit");
-
-		employeeDetailsPanel.add(buttonPanel, "span 2,growx, pushx,wrap");
+//		buttonPanel.add(saveBtn = new JButton("Save"));
+//		saveBtn.addActionListener(this);
+//		saveBtn.setVisible(false);
+//		saveBtn.setToolTipText("Save changes");
+//		buttonPanel.add(cancelBtn = new JButton("Cancel"));
+//		cancelBtn.addActionListener(this);
+//		cancelBtn.setVisible(false);
+//		cancelBtn.setToolTipText("Cancel edit");
+//
+//		employeeDetailsPanel.add(buttonPanel, "span 2,growx, pushx,wrap");
 		
 		refactor.addStyleAndListeners(employeeDetailsPanel, this, false);
 		// loop through panel components and add listeners and format
@@ -793,8 +793,8 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 		deptComboBox.setEnabled(booleanValue);
 		salaryField.setEditable(booleanValue);
 		fullTimeComboBox.setEnabled(booleanValue);
-		saveChangeBtn.setVisible(booleanValue);
-		cancelChangeBtn.setVisible(booleanValue);
+		saveBtn.setVisible(booleanValue);
+		cancelBtn.setVisible(booleanValue);
 		searchByIdField.setEnabled(search);
 		searchBySurnameField.setEnabled(search);
 		searchIdBtn.setEnabled(search);
@@ -1015,10 +1015,10 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 			searchEmployeeById();
 		else if (e.getSource() == searchSurnameBtn || e.getSource() == searchBySurnameField)
 			searchEmployeeBySurname();
-		else if (e.getSource() == saveChangeBtn) {
+		else if (e.getSource() == saveBtn) {
 			if (checkInput() && !checkForChanges())
 				;
-		} else if (e.getSource() == cancelChangeBtn)
+		} else if (e.getSource() == cancelBtn)
 			cancelChange();
 		else if (e.getSource() == firstMenuItm || e.getSource() == firstBtn) {
 			if (checkInput() && !checkForChanges()) {

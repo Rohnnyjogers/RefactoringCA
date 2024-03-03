@@ -49,7 +49,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 
-public class EmployeeDetails extends JFrame implements ActionListener, ItemListener, DocumentListener, WindowListener, EmployeeDatailsInterface {
+public class EmployeeDetails extends JFrame implements ActionListener, ItemListener, DocumentListener, WindowListener, EmployeeDetailsInterface {
 	// decimal format for inactive currency text field
 	private static final DecimalFormat format = new DecimalFormat("\u20ac ###,###,##0.00");
 	// decimal format for active currency text field
@@ -897,29 +897,33 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 		else {
 			// if changes has been made to text field offer user to save these
 			// changes
-			if (textFieldChange) {
-				int returnVal = JOptionPane.showOptionDialog(frame, "Do you want to save changes?", "Save",
-						JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
-				// save changes if user choose this option
-				if (returnVal == JOptionPane.YES_OPTION) {
-					// save changes if ID field is not empty
-					if (!idField.getText().equals("")) {
-						// open file for writing
-						application.openWriteFile(file.getAbsolutePath());
-						// get changes for current Employee
-						currentEmployee = getChangedDetails();
-						// write changes to file for corresponding Employee
-						// record
-						application.changeRecords(currentEmployee, currentByteStart);
-						application.closeWriteFile();// close file for writing
-					} // end if
-				} // end if
-			} // end if
+			saveChangesToFile();
 
 			displayRecords(currentEmployee);
 			setEnabled(false);
 		} // end else
 	}// end saveFile
+	
+	public void saveChangesToFile() {
+		if (textFieldChange) {
+			int returnVal = JOptionPane.showOptionDialog(frame, "Do you want to save changes?", "Save",
+					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+			// save changes if user choose this option
+			if (returnVal == JOptionPane.YES_OPTION) {
+				// save changes if ID field is not empty
+				if (!idField.getText().equals("")) {
+					// open file for writing
+					application.openWriteFile(file.getAbsolutePath());
+					// get changes for current Employee
+					currentEmployee = getChangedDetails();
+					// write changes to file for corresponding Employee
+					// record
+					application.changeRecords(currentEmployee, currentByteStart);
+					application.closeWriteFile();// close file for writing
+				} // end if
+			} // end if
+		} // end if
+	}
 
 	// save changes to current Employee
 	private void saveChanges() {
@@ -943,7 +947,7 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 	// save file as 'save as'
 	private void saveFileAs() {
 		final JFileChooser fc = new JFileChooser();
-		File newFile;
+		File newFile = null;
 		String defaultFileName = "new_Employee.dat";
 		fc.setDialogTitle("Save As");
 		// display files only with .dat extension
@@ -951,6 +955,11 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 		fc.setApproveButtonText("Save");
 		fc.setSelectedFile(new File(defaultFileName));
 
+		openSaveAsDialog(fc, newFile);
+		fileChange = false;
+	}// end saveFileAs
+	
+	public void openSaveAsDialog(JFileChooser fc, File newFile) {
 		int returnVal = fc.showSaveDialog(EmployeeDetails.this);
 		// if file has chosen or written, save old file in new file
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -976,9 +985,8 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 			catch (IOException e) {
 			} // end catch
 		} // end if
-		fileChange = false;
-	}// end saveFileAs
-
+	}
+	
 	// allow to save changes to file when exiting the application
 	private void exitApp() {
 		// if file is not empty allow to save changes

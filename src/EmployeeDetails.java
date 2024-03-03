@@ -49,7 +49,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 
-public class EmployeeDetails extends JFrame implements ActionListener, ItemListener, DocumentListener, WindowListener {
+public class EmployeeDetails extends JFrame implements ActionListener, ItemListener, DocumentListener, WindowListener, RefactorInterface {
 	// decimal format for inactive currency text field
 	private static final DecimalFormat format = new DecimalFormat("\u20ac ###,###,##0.00");
 	// decimal format for active currency text field
@@ -258,49 +258,88 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 
 	// initialize main/details panel
 	private JPanel detailsPanel() {
+		JPanel employeeDetailsPanel = createEmployeeDetailsPanel();
+		formatFields(employeeDetailsPanel);
 		
-//		JPanel buttonPanel = new JPanel();
-		JPanel employeeDetailsPanel = refactor.createEmployeeDetailsPanel(this);
-
-//		buttonPanel.add(saveBtn = new JButton("Save"));
-//		saveBtn.addActionListener(this);
-//		saveBtn.setVisible(false);
-//		saveBtn.setToolTipText("Save changes");
-//		buttonPanel.add(cancelBtn = new JButton("Cancel"));
-//		cancelBtn.addActionListener(this);
-//		cancelBtn.setVisible(false);
-//		cancelBtn.setToolTipText("Cancel edit");
-//
-//		employeeDetailsPanel.add(buttonPanel, "span 2,growx, pushx,wrap");
-		
-		refactor.addStyleAndListeners(employeeDetailsPanel, this, false);
-		// loop through panel components and add listeners and format
-//		for (int i = 0; i < empDetails.getComponentCount(); i++) {
-//			empDetails.getComponent(i).setFont(font);
-//			if (empDetails.getComponent(i) instanceof JTextField) {
-//				field = (JTextField) empDetails.getComponent(i);
-//				field.setEditable(false);
-//				if (field == ppsField)
-//					field.setDocument(new JTextFieldLimit(9));
-//				else
-//					field.setDocument(new JTextFieldLimit(20));
-//				field.getDocument().addDocumentListener(this);
-//			} // end if
-//			else if (empDetails.getComponent(i) instanceof JComboBox) {
-//				empDetails.getComponent(i).setBackground(Color.WHITE);
-//				empDetails.getComponent(i).setEnabled(false);
-//				((JComboBox<String>) empDetails.getComponent(i)).addItemListener(this);
-//				((JComboBox<String>) empDetails.getComponent(i)).setRenderer(new DefaultListCellRenderer() {
-//					// set foreground to combo boxes
-//					public void paint(Graphics g) {
-//						setForeground(new Color(65, 65, 65));
-//						super.paint(g);
-//					}// end paint
-//				});
-//			} // end else if
-//		} // end for
 		return employeeDetailsPanel;
 	}// end detailsPanel
+	
+	@Override
+	public JPanel createEmployeeDetailsPanel() {
+		JPanel employeeDetailsPanel = new JPanel(new MigLayout());
+		JPanel buttonPanel = new JPanel();
+
+		employeeDetailsPanel.setBorder(BorderFactory.createTitledBorder("Employee Details"));
+
+		employeeDetailsPanel.add(new JLabel("ID:"), "growx, pushx");
+		employeeDetailsPanel.add(idField = new JTextField(20), "growx, pushx, wrap");
+		idField.setEditable(false);
+		
+
+		employeeDetailsPanel.add(new JLabel("PPS Number:"), "growx, pushx");
+		employeeDetailsPanel.add(ppsField = new JTextField(20), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Surname:"), "growx, pushx");
+		employeeDetailsPanel.add(surnameField = new JTextField(20), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("First Name:"), "growx, pushx");
+		employeeDetailsPanel.add(firstNameField = new JTextField(20), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Gender:"), "growx, pushx");
+		employeeDetailsPanel.add(genderComboBox = new JComboBox<String>(gender), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Department:"), "growx, pushx");
+		employeeDetailsPanel.add(deptComboBox = new JComboBox<String>(department), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Salary:"), "growx, pushx");
+		employeeDetailsPanel.add(salaryField = new JTextField(20), "growx, pushx, wrap");
+
+		employeeDetailsPanel.add(new JLabel("Full Time:"), "growx, pushx");
+		employeeDetailsPanel.add(fullTimeComboBox = new JComboBox<String>(fullTime), "growx, pushx, wrap");
+		
+		buttonPanel.add(saveBtn = new JButton("Save"));
+		saveBtn.addActionListener(this);
+		saveBtn.setVisible(false);
+		saveBtn.setToolTipText("Save changes");
+		buttonPanel.add(cancelBtn = new JButton("Cancel"));
+		cancelBtn.addActionListener(this);
+		cancelBtn.setVisible(false);
+		cancelBtn.setToolTipText("Cancel edit");
+		
+		employeeDetailsPanel.add(buttonPanel, "span 2,growx, pushx,wrap");
+	
+		return employeeDetailsPanel;
+	}
+	
+	@Override
+	public void formatFields(JPanel employeeDetailsPanel) {
+		JTextField field;
+		
+		for (int i = 0; i < employeeDetailsPanel.getComponentCount(); i++) {
+		employeeDetailsPanel.getComponent(i).setFont(font);
+		if (employeeDetailsPanel.getComponent(i) instanceof JTextField) {
+			field = (JTextField) employeeDetailsPanel.getComponent(i);
+			field.setEditable(false);
+			if (field == ppsField)
+				field.setDocument(new JTextFieldLimit(9));
+			else
+				field.setDocument(new JTextFieldLimit(20));
+			field.getDocument().addDocumentListener(this);
+		} // end if
+		else if (employeeDetailsPanel.getComponent(i) instanceof JComboBox) {
+			employeeDetailsPanel.getComponent(i).setBackground(Color.WHITE);
+			employeeDetailsPanel.getComponent(i).setEnabled(false);
+			((JComboBox<String>) employeeDetailsPanel.getComponent(i)).addItemListener(this);
+			((JComboBox<String>) employeeDetailsPanel.getComponent(i)).setRenderer(new DefaultListCellRenderer() {
+				// set foreground to combo boxes
+				public void paint(Graphics g) {
+					setForeground(new Color(65, 65, 65));
+					super.paint(g);
+				}// end paint
+			});
+		} // end else if
+	} // end for
+	}
 
 	// display current Employee details
 	public void displayRecords(Employee thisEmployee) {
@@ -546,10 +585,13 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 		if (((String) fullTimeComboBox.getSelectedItem()).equalsIgnoreCase("Yes"))
 			fullTime = true;
 
-		theEmployee = new Employee(Integer.parseInt(idField.getText()), ppsField.getText().toUpperCase(),
-				surnameField.getText().toUpperCase(), firstNameField.getText().toUpperCase(),
-				genderComboBox.getSelectedItem().toString().charAt(0), deptComboBox.getSelectedItem().toString(),
-				Double.parseDouble(salaryField.getText()), fullTime);
+		theEmployee = new Employee(	Integer.parseInt(idField.getText()), 
+									ppsField.getText().toUpperCase(),
+									surnameField.getText().toUpperCase(), 
+									firstNameField.getText().toUpperCase(),
+									genderComboBox.getSelectedItem().toString().charAt(0), 
+									deptComboBox.getSelectedItem().toString(),
+									Double.parseDouble(salaryField.getText()), fullTime);
 
 		return theEmployee;
 	}// end getChangedDetails
@@ -712,7 +754,8 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 	}// end checkForChanges
 
 	// check for input in text fields
-	private boolean checkInput() {
+	@Override
+	public boolean checkInput() {
 		boolean valid = true;
 		// if any of inputs are in wrong format, colour text field and display
 		// message
@@ -769,7 +812,8 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 	}
 
 	// set text field background colour to white
-	private void setToWhite() {
+	@Override
+	public void setToWhite() {
 		ppsField.setBackground(UIManager.getColor("TextField.background"));
 		surnameField.setBackground(UIManager.getColor("TextField.background"));
 		firstNameField.setBackground(UIManager.getColor("TextField.background"));
@@ -989,6 +1033,7 @@ public class EmployeeDetails extends JFrame implements ActionListener, ItemListe
 	}// end createRandomFile
 
 	// action listener for buttons, text field and menu items
+	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getSource() == closeAppMenuItm) {

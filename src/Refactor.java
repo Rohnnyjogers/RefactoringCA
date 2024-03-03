@@ -113,48 +113,4 @@ public class Refactor {
 	
 		return employeeDetailsPanel;
 	}
-	
-	/*A method that iterates through each component present in the
-	 *JPanel parameter passed, formats each field and attaches listeners. */
-	public void addStyleAndListeners(	JPanel employeeDetailsPanel, 
-										EmployeeDetails employeeDetails,
-										boolean editable
-										) {
-		JTextField field;
-		
-		for (int i = 0; i < employeeDetailsPanel.getComponentCount(); i++) {
-			employeeDetailsPanel.getComponent(i).setFont(font);
-			if (employeeDetailsPanel.getComponent(i) instanceof JTextField && !editable) {
-				field = (JTextField) employeeDetailsPanel.getComponent(i);
-				field.setEditable(false);
-				if (field == employeeDetails.ppsField)
-					field.setDocument(new JTextFieldLimit(9));
-				else
-					field.setDocument(new JTextFieldLimit(20));
-				field.getDocument().addDocumentListener(employeeDetails);
-			} 
-			else if (employeeDetailsPanel.getComponent(i) instanceof JComboBox && !editable) {
-				employeeDetailsPanel.getComponent(i).setBackground(Color.WHITE);
-				employeeDetailsPanel.getComponent(i).setEnabled(false);
-				((JComboBox<String>) employeeDetailsPanel.getComponent(i)).addItemListener(employeeDetails);
-				((JComboBox<String>) employeeDetailsPanel.getComponent(i)).setRenderer(new DefaultListCellRenderer() {
-					// set foregroung to combo boxes
-					public void paint(Graphics g) {
-						setForeground(new Color(65, 65, 65));
-						super.paint(g);
-					}
-				});
-			}
-			else if(employeeDetailsPanel.getComponent(i) instanceof JComboBox){
-				employeeDetailsPanel.getComponent(i).setBackground(Color.WHITE);
-			}
-			else if(employeeDetailsPanel.getComponent(i) instanceof JComboBox){
-				field = (JTextField) employeeDetailsPanel.getComponent(i);
-				if(field == employeeDetails.ppsField)
-					field.setDocument(new JTextFieldLimit(9));
-				else
-				field.setDocument(new JTextFieldLimit(20));
-			}
-		}
-	}
 }
